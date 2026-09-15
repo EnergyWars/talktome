@@ -6,6 +6,8 @@ enum class GeminiErrorReason {
     NETWORK,
     INPUT_TOO_LONG,
     EMPTY_RESPONSE,
+    BLOCKED_BY_SAFETY_FILTER,
+    SERVICE_UNAVAILABLE,
     UNKNOWN,
 }
 
@@ -14,6 +16,7 @@ sealed interface GeminiConnectionResult {
     data object InvalidApiKey : GeminiConnectionResult
     data object RateLimited : GeminiConnectionResult
     data object NetworkError : GeminiConnectionResult
+    data object ServiceUnavailable : GeminiConnectionResult
     data class UnknownError(val statusCode: Int) : GeminiConnectionResult
 }
 

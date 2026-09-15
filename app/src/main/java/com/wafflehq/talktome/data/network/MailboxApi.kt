@@ -1,5 +1,6 @@
 package com.wafflehq.talktome.data.network
 
+import android.util.Log
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.delete
@@ -82,11 +83,16 @@ class MailboxApi @Inject constructor(private val httpClient: HttpClient) {
         val response = httpClient.delete(baseUrl(serverBaseUrl, "/mailbox/$messageId")) {
             header(HttpHeaders.Authorization, "Bearer $token")
         }
+        Log.d(TAG, "acknowledge: received HTTP ${response.status.value}")
         when (response.status) {
             HttpStatusCode.NoContent -> MailboxResult.Success(Unit)
-            else -> MailboxResult.Failure(reasonFor(response.status))
+            else -> {
+                Log.w(TAG, "acknowledge: non-success response ${response.status.value}")
+                MailboxResult.Failure(reasonFor(response.status))
+            }
         }
     } catch (e: Exception) {
+        Log.e(TAG, "acknowledge: request failed with ${e.javaClass.simpleName}: ${e.message}", e)
         MailboxResult.Failure(MailboxErrorReason.NETWORK)
     }
 
@@ -101,11 +107,20 @@ class MailboxApi @Inject constructor(private val httpClient: HttpClient) {
 
     private suspend inline fun <reified T> request(call: () -> HttpResponse): MailboxResult<T> = try {
         val response = call()
+        Log.d(TAG, "request: received HTTP ${response.status.value}")
         when (response.status) {
             HttpStatusCode.OK, HttpStatusCode.Created -> MailboxResult.Success(response.body())
-            else -> MailboxResult.Failure(reasonFor(response.status))
+            else -> {
+                Log.w(TAG, "request: non-success response ${response.status.value}")
+                MailboxResult.Failure(reasonFor(response.status))
+            }
         }
     } catch (e: Exception) {
+        Log.e(TAG, "request: failed with ${e.javaClass.simpleName}: ${e.message}", e)
         MailboxResult.Failure(MailboxErrorReason.NETWORK)
+    }
+
+    private companion object {
+        const val TAG = "MailboxApi"
     }
 }

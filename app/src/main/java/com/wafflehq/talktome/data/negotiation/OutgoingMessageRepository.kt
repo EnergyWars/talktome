@@ -1,5 +1,6 @@
 package com.wafflehq.talktome.data.negotiation
 
+import android.util.Log
 import com.wafflehq.talktome.data.crypto.DeviceIdentityStore
 import com.wafflehq.talktome.data.crypto.E2eIdentity
 import com.wafflehq.talktome.data.db.MediatorAgentRole
@@ -49,6 +50,8 @@ enum class OutgoingActionErrorReason {
     INVALID_API_KEY,
     NO_PARTNER,
     NETWORK,
+    BLOCKED_BY_SAFETY_FILTER,
+    SERVICE_UNAVAILABLE,
     SERVER_ERROR,
 }
 
@@ -98,12 +101,19 @@ class OutgoingMessageRepository @Inject constructor(
     }
 
     suspend fun startNegotiation(messageId: Long): OutgoingActionResult {
+        Log.d(TAG, "startNegotiation: messageId=$messageId")
         val message = outgoingMessageDao.getById(messageId)
-            ?: return OutgoingActionResult.Failure(OutgoingActionErrorReason.SERVER_ERROR)
+            ?: run {
+                Log.w(TAG, "startNegotiation: no message found for id=$messageId")
+                return OutgoingActionResult.Failure(OutgoingActionErrorReason.SERVER_ERROR)
+            }
         if (message.status != OutgoingMessageStatus.DRAFT) return OutgoingActionResult.Success
 
         val apiKey = secureApiKeyStore.getApiKey()
-            ?: return OutgoingActionResult.Failure(OutgoingActionErrorReason.NO_API_KEY)
+            ?: run {
+                Log.w(TAG, "startNegotiation: aborted, no API key stored")
+                return OutgoingActionResult.Failure(OutgoingActionErrorReason.NO_API_KEY)
+            }
         val profile = profileRepository.profile.first()
         val context = MediatorContext(selfDescription = profile.selfDescription, partnerDescription = profile.partnerDescription)
 
@@ -120,8 +130,10 @@ class OutgoingMessageRepository @Inject constructor(
         val opinions = opinionResults.mapNotNull { (label, result) ->
             (result as? GeminiGenerateContentResult.Success)?.let { FriendOpinion(label, it.text) }
         }
+        Log.d(TAG, "startNegotiation: opinions succeeded=${opinions.size}/${opinionResults.size}")
         if (opinions.isEmpty()) {
             val reasons = opinionResults.map { it.second }.filterIsInstance<GeminiGenerateContentResult.Error>().map { it.reason }
+            Log.w(TAG, "startNegotiation: all opinion calls failed, reasons=$reasons")
             return OutgoingActionResult.Failure(reasons.toOutgoingReason())
         }
 
@@ -130,7 +142,11 @@ class OutgoingMessageRepository @Inject constructor(
         val userContent = PromptBuilder.neutralMediatorUserContent(message.draftText, opinions)
         val summaryResult = geminiClient.generateContent(apiKey, systemInstruction, userContent)
         val summaryText = (summaryResult as? GeminiGenerateContentResult.Success)?.text
-            ?: return OutgoingActionResult.Failure((summaryResult as GeminiGenerateContentResult.Error).reason.toOutgoingReason())
+            ?: run {
+                val reason = (summaryResult as GeminiGenerateContentResult.Error).reason
+                Log.w(TAG, "startNegotiation: mediator summary call failed, reason=$reason")
+                return OutgoingActionResult.Failure(reason.toOutgoingReason())
+            }
 
         val now = System.currentTimeMillis()
         outgoingMessageDao.upsert(
@@ -150,10 +166,17 @@ class OutgoingMessageRepository @Inject constructor(
     }
 
     suspend fun sendReply(messageId: Long, userText: String): OutgoingActionResult {
+        Log.d(TAG, "sendReply: messageId=$messageId")
         val message = outgoingMessageDao.getById(messageId)
-            ?: return OutgoingActionResult.Failure(OutgoingActionErrorReason.SERVER_ERROR)
+            ?: run {
+                Log.w(TAG, "sendReply: no message found for id=$messageId")
+                return OutgoingActionResult.Failure(OutgoingActionErrorReason.SERVER_ERROR)
+            }
         val apiKey = secureApiKeyStore.getApiKey()
-            ?: return OutgoingActionResult.Failure(OutgoingActionErrorReason.NO_API_KEY)
+            ?: run {
+                Log.w(TAG, "sendReply: aborted, no API key stored")
+                return OutgoingActionResult.Failure(OutgoingActionErrorReason.NO_API_KEY)
+            }
 
         val history = negotiationTurnDao.getForMessage(messageId).map {
             GeminiTurn(if (it.sender == NegotiationTurnSender.USER) GeminiRole.USER else GeminiRole.MODEL, it.text)
@@ -162,7 +185,11 @@ class OutgoingMessageRepository @Inject constructor(
         val systemInstruction = NotesContext.append(MediatorPrompts.neutralMediator(), notes)
         val result = geminiClient.generateContent(apiKey, systemInstruction, PromptBuilder.wrapUserMessage(userText), history = history)
         val replyText = (result as? GeminiGenerateContentResult.Success)?.text
-            ?: return OutgoingActionResult.Failure((result as GeminiGenerateContentResult.Error).reason.toOutgoingReason())
+            ?: run {
+                val reason = (result as GeminiGenerateContentResult.Error).reason
+                Log.w(TAG, "sendReply: mediator reply call failed, reason=$reason")
+                return OutgoingActionResult.Failure(reason.toOutgoingReason())
+            }
 
         val now = System.currentTimeMillis()
         outgoingMessageDao.upsert(message.copy(draftText = userText, updatedAt = now))
@@ -174,14 +201,24 @@ class OutgoingMessageRepository @Inject constructor(
     }
 
     suspend fun send(messageId: Long): OutgoingActionResult {
+        Log.d(TAG, "send: messageId=$messageId")
         val message = outgoingMessageDao.getById(messageId)
-            ?: return OutgoingActionResult.Failure(OutgoingActionErrorReason.SERVER_ERROR)
+            ?: run {
+                Log.w(TAG, "send: no message found for id=$messageId")
+                return OutgoingActionResult.Failure(OutgoingActionErrorReason.SERVER_ERROR)
+            }
         val partner = partnerDao.get()
         val remoteDeviceId = partner?.remoteDeviceId
         val remotePublicKey = partner?.publicKey
         val serverBaseUrl = partner?.serverBaseUrl
         val identity = deviceIdentityStore.getIdentity()
         if (remoteDeviceId == null || remotePublicKey == null || serverBaseUrl == null || identity == null) {
+            Log.w(
+                TAG,
+                "send: aborted, missing pairing data (partner=${partner != null}, " +
+                    "remoteDeviceId=${remoteDeviceId != null}, publicKey=${remotePublicKey != null}, " +
+                    "serverBaseUrl=${serverBaseUrl != null}, deviceIdentity=${identity != null})",
+            )
             return OutgoingActionResult.Failure(OutgoingActionErrorReason.NO_PARTNER)
         }
 
@@ -198,6 +235,7 @@ class OutgoingMessageRepository @Inject constructor(
 
         return when (val result = mailboxApi.submit(serverBaseUrl, identity.token, remoteDeviceId, submission)) {
             is MailboxResult.Success -> {
+                Log.d(TAG, "send: mailbox submission succeeded, serverMessageId=${result.value.messageId}")
                 outgoingMessageDao.upsert(
                     message.copy(
                         status = OutgoingMessageStatus.SENT,
@@ -208,7 +246,10 @@ class OutgoingMessageRepository @Inject constructor(
                 writeNote(MediatorAgentRole.NEUTRAL_MEDIATOR, messageId)
                 OutgoingActionResult.Success
             }
-            is MailboxResult.Failure -> OutgoingActionResult.Failure(result.reason.toOutgoingReason())
+            is MailboxResult.Failure -> {
+                Log.w(TAG, "send: mailbox submission failed, reason=${result.reason}")
+                OutgoingActionResult.Failure(result.reason.toOutgoingReason())
+            }
         }
     }
 
@@ -260,6 +301,8 @@ class OutgoingMessageRepository @Inject constructor(
     private fun GeminiErrorReason.toOutgoingReason(): OutgoingActionErrorReason = when (this) {
         GeminiErrorReason.INVALID_API_KEY -> OutgoingActionErrorReason.INVALID_API_KEY
         GeminiErrorReason.NETWORK -> OutgoingActionErrorReason.NETWORK
+        GeminiErrorReason.BLOCKED_BY_SAFETY_FILTER -> OutgoingActionErrorReason.BLOCKED_BY_SAFETY_FILTER
+        GeminiErrorReason.SERVICE_UNAVAILABLE -> OutgoingActionErrorReason.SERVICE_UNAVAILABLE
         GeminiErrorReason.RATE_LIMITED, GeminiErrorReason.INPUT_TOO_LONG, GeminiErrorReason.EMPTY_RESPONSE, GeminiErrorReason.UNKNOWN ->
             OutgoingActionErrorReason.SERVER_ERROR
     }
@@ -267,10 +310,12 @@ class OutgoingMessageRepository @Inject constructor(
     private fun List<GeminiErrorReason>.toOutgoingReason(): OutgoingActionErrorReason = when {
         isEmpty() -> OutgoingActionErrorReason.NETWORK
         any { it == GeminiErrorReason.INVALID_API_KEY } -> OutgoingActionErrorReason.INVALID_API_KEY
+        any { it == GeminiErrorReason.SERVICE_UNAVAILABLE } -> OutgoingActionErrorReason.SERVICE_UNAVAILABLE
         else -> first().toOutgoingReason()
     }
 
     private companion object {
+        const val TAG = "OutgoingMessageRepo"
         const val ESCALATION_THRESHOLD = 3
         const val LABEL_PARTNER_FRIENDS_WITHOUT_CONTEXT =
             "Freunde des Empfängers, ohne den Sender zu kennen oder den Empfänger zu berücksichtigen"

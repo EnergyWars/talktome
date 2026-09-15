@@ -1,5 +1,6 @@
 package com.wafflehq.talktome.data.security
 
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -28,13 +29,20 @@ class SecureApiKeyStore @Inject constructor(
 
     suspend fun getApiKey(): String? {
         val prefs = dataStore.data.first()
-        val ivBase64 = prefs[ivKey] ?: return null
-        val ciphertextBase64 = prefs[ciphertextKey] ?: return null
+        val ivBase64 = prefs[ivKey] ?: run {
+            Log.d(TAG, "getApiKey: no key stored")
+            return null
+        }
+        val ciphertextBase64 = prefs[ciphertextKey] ?: run {
+            Log.d(TAG, "getApiKey: no key stored")
+            return null
+        }
         val iv = Base64.getDecoder().decode(ivBase64)
         val ciphertext = Base64.getDecoder().decode(ciphertextBase64)
         return try {
             cipher.decrypt(iv, ciphertext).toString(Charsets.UTF_8)
         } catch (e: GeneralSecurityException) {
+            Log.w(TAG, "getApiKey: decrypt failed with ${e.javaClass.simpleName}, clearing corrupted entry", e)
             clearApiKey()
             null
         }
@@ -54,5 +62,9 @@ class SecureApiKeyStore @Inject constructor(
             prefs.remove(ivKey)
             prefs.remove(ciphertextKey)
         }
+    }
+
+    private companion object {
+        const val TAG = "SecureApiKeyStore"
     }
 }

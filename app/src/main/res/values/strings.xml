@@ -51,6 +51,7 @@
     <string name="gemini_error_invalid_key">The key is invalid or was rejected.</string>
     <string name="gemini_error_rate_limited">Too many requests. Please try again later.</string>
     <string name="gemini_error_network">Could not connect. Check your internet connection.</string>
+    <string name="gemini_error_service_unavailable">Gemini\'s servers are currently overloaded. Try again in a few minutes.</string>
     <string name="gemini_error_unknown">Unknown connection error.</string>
     <string name="gemini_remove_dialog_title">Remove key?</string>
     <string name="gemini_remove_dialog_body">Without an API key, no messages can be reviewed by the AI until you add a new one.</string>
@@ -108,6 +109,8 @@
     <string name="compose_error_invalid_api_key">Your Gemini API key was rejected. Check it under \"Gemini connection\".</string>
     <string name="compose_error_no_partner">You are not paired with anyone yet. Set up partner pairing first.</string>
     <string name="compose_error_network">Could not connect. Please try again later.</string>
+    <string name="compose_error_blocked_by_safety_filter">Gemini blocked the response for safety reasons. Rephrase your message and try again.</string>
+    <string name="compose_error_service_unavailable">Gemini\'s servers are currently overloaded. The app cannot be used right now — try again in a few minutes.</string>
     <string name="compose_error_server">The server rejected the request.</string>
     <string name="compose_escalation_title">Rejected multiple times</string>
     <string name="compose_escalation_body">This message has been rejected several times. A break or a completely different approach might help.</string>

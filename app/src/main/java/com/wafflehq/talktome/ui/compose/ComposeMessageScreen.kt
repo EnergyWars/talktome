@@ -178,6 +178,8 @@ private fun composeErrorBody(reason: OutgoingActionErrorReason): String = when (
     OutgoingActionErrorReason.INVALID_API_KEY -> stringResource(R.string.compose_error_invalid_api_key)
     OutgoingActionErrorReason.NO_PARTNER -> stringResource(R.string.compose_error_no_partner)
     OutgoingActionErrorReason.NETWORK -> stringResource(R.string.compose_error_network)
+    OutgoingActionErrorReason.BLOCKED_BY_SAFETY_FILTER -> stringResource(R.string.compose_error_blocked_by_safety_filter)
+    OutgoingActionErrorReason.SERVICE_UNAVAILABLE -> stringResource(R.string.compose_error_service_unavailable)
     OutgoingActionErrorReason.SERVER_ERROR -> stringResource(R.string.compose_error_server)
 }
 

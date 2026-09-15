@@ -81,6 +81,15 @@ class GeminiClientTest {
     }
 
     @Test
+    fun `verifyApiKey returns ServiceUnavailable for HTTP 503`() = runTest {
+        val client = GeminiClient(clientReturning(HttpStatusCode.ServiceUnavailable), noDelay())
+
+        val result = client.verifyApiKey("some-key")
+
+        assertEquals(GeminiConnectionResult.ServiceUnavailable, result)
+    }
+
+    @Test
     fun `verifyApiKey returns NetworkError when the engine throws`() = runTest {
         val failingClient = HttpClient(MockEngine { throw java.io.IOException("no network") }) {
             install(ContentNegotiation) { json(Json { ignoreUnknownKeys = true }) }
@@ -206,6 +215,65 @@ class GeminiClientTest {
         assertTrue(capturedBody.contains("Erste Antwort"))
         assertTrue(capturedBody.contains("Zweite Nachricht"))
         assertTrue(capturedBody.indexOf("Erste Nachricht") < capturedBody.indexOf("Zweite Nachricht"))
+    }
+
+    @Test
+    fun `generateContent retries on 503 and eventually succeeds`() = runTest {
+        var attempt = 0
+        val overloadedThenOk = HttpClient(MockEngine { _ ->
+            attempt++
+            if (attempt < 2) {
+                respond("{}", HttpStatusCode.ServiceUnavailable)
+            } else {
+                respond(
+                    content = """{"candidates":[{"content":{"parts":[{"text":"ok"}]}}]}""",
+                    status = HttpStatusCode.OK,
+                    headers = jsonHeaders(),
+                )
+            }
+        }) {
+            install(ContentNegotiation) { json(Json { ignoreUnknownKeys = true }) }
+        }
+        val client = GeminiClient(overloadedThenOk, noDelay())
+
+        val result = client.generateContent("key", "system", "user text")
+
+        assertEquals(GeminiGenerateContentResult.Success("ok"), result)
+        assertEquals(2, attempt)
+    }
+
+    @Test
+    fun `generateContent gives up with SERVICE_UNAVAILABLE after exhausting retries on persistent 503`() = runTest {
+        val alwaysOverloaded = HttpClient(MockEngine { _ ->
+            respond("{}", HttpStatusCode.ServiceUnavailable)
+        }) {
+            install(ContentNegotiation) { json(Json { ignoreUnknownKeys = true }) }
+        }
+        val client = GeminiClient(alwaysOverloaded, noDelay())
+
+        val result = client.generateContent("key", "system", "user text")
+
+        assertEquals(GeminiGenerateContentResult.Error(GeminiErrorReason.SERVICE_UNAVAILABLE), result)
+    }
+
+    @Test
+    fun `generateContent returns BLOCKED_BY_SAFETY_FILTER when the prompt was blocked`() = runTest {
+        val body = """{"candidates":[],"promptFeedback":{"blockReason":"SAFETY"}}"""
+        val client = GeminiClient(clientReturning(HttpStatusCode.OK, body), noDelay())
+
+        val result = client.generateContent("key", "system", "user text")
+
+        assertEquals(GeminiGenerateContentResult.Error(GeminiErrorReason.BLOCKED_BY_SAFETY_FILTER), result)
+    }
+
+    @Test
+    fun `generateContent returns BLOCKED_BY_SAFETY_FILTER when the candidate finish reason is SAFETY`() = runTest {
+        val body = """{"candidates":[{"content":{"parts":[]},"finishReason":"SAFETY"}]}"""
+        val client = GeminiClient(clientReturning(HttpStatusCode.OK, body), noDelay())
+
+        val result = client.generateContent("key", "system", "user text")
+
+        assertEquals(GeminiGenerateContentResult.Error(GeminiErrorReason.BLOCKED_BY_SAFETY_FILTER), result)
     }
 
     @Test

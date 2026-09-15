@@ -163,6 +163,7 @@ private fun connectionErrorBody(result: GeminiConnectionResult): String = when (
     GeminiConnectionResult.InvalidApiKey -> stringResource(R.string.gemini_error_invalid_key)
     GeminiConnectionResult.RateLimited -> stringResource(R.string.gemini_error_rate_limited)
     GeminiConnectionResult.NetworkError -> stringResource(R.string.gemini_error_network)
+    GeminiConnectionResult.ServiceUnavailable -> stringResource(R.string.gemini_error_service_unavailable)
     is GeminiConnectionResult.UnknownError -> stringResource(R.string.gemini_error_unknown)
     GeminiConnectionResult.Success -> ""
 }

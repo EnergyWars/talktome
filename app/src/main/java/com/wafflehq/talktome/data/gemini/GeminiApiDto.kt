@@ -24,8 +24,14 @@ data class GeminiCandidate(
 )
 
 @Serializable
+data class GeminiPromptFeedback(
+    val blockReason: String? = null,
+)
+
+@Serializable
 data class GeminiGenerateContentResponse(
     val candidates: List<GeminiCandidate> = emptyList(),
+    val promptFeedback: GeminiPromptFeedback? = null,
 )
 
 @Serializable

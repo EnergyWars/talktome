@@ -51,6 +51,7 @@
     <string name="gemini_error_invalid_key">Der Schlüssel ist ungültig oder wurde abgelehnt.</string>
     <string name="gemini_error_rate_limited">Zu viele Anfragen. Versuche es später erneut.</string>
     <string name="gemini_error_network">Keine Verbindung möglich. Prüfe deine Internetverbindung.</string>
+    <string name="gemini_error_service_unavailable">Die Gemini-Server sind gerade überlastet. Versuche es in ein paar Minuten erneut.</string>
     <string name="gemini_error_unknown">Unbekannter Fehler bei der Verbindung.</string>
     <string name="gemini_remove_dialog_title">Schlüssel wirklich entfernen?</string>
     <string name="gemini_remove_dialog_body">Ohne API-Schlüssel können keine Nachrichten mehr von der KI geprüft werden, bis du einen neuen hinterlegst.</string>
@@ -108,6 +109,8 @@
     <string name="compose_error_invalid_api_key">Dein Gemini-API-Schlüssel wurde abgelehnt. Prüfe ihn unter „Gemini-Verbindung“.</string>
     <string name="compose_error_no_partner">Du bist noch mit niemandem gekoppelt. Richte zuerst die Partner-Kopplung ein.</string>
     <string name="compose_error_network">Keine Verbindung möglich. Versuche es später erneut.</string>
+    <string name="compose_error_blocked_by_safety_filter">Gemini hat die Antwort aus Sicherheitsgründen blockiert. Formuliere deine Nachricht anders und versuche es erneut.</string>
+    <string name="compose_error_service_unavailable">Die Gemini-Server sind aktuell überlastet. Die App kann im Moment nicht genutzt werden – versuche es in ein paar Minuten erneut.</string>
     <string name="compose_error_server">Der Server hat die Anfrage abgelehnt.</string>
     <string name="compose_escalation_title">Mehrfach abgelehnt</string>
     <string name="compose_escalation_body">Diese Nachricht wurde schon mehrmals abgelehnt. Vielleicht hilft eine Pause oder ein ganz neuer Ansatz.</string>

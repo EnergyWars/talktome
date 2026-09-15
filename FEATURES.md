@@ -20,7 +20,7 @@ Screen unter „Gemini-Verbindung“. Der Nutzer trägt seinen eigenen Gemini-AP
 - „Speichern & testen“ prüft den Schlüssel per echtem API-Aufruf, bevor er gespeichert wird.
 - Der Schlüssel wird ausschließlich verschlüsselt auf dem Gerät gespeichert (Android Keystore), niemals im Klartext.
 - Ein Hinweisbanner erklärt, dass Texte zur Verarbeitung an Google Gemini gesendet werden, aber nie an den Partner oder einen Server dieser App.
-- Fehleranzeige für ungültigen Schlüssel, Rate-Limit und fehlende Internetverbindung.
+- Fehleranzeige für ungültigen Schlüssel, Rate-Limit, fehlende Internetverbindung und überlastete Gemini-Server (HTTP 503, mit Hinweis, es später erneut zu versuchen).
 - „Schlüssel entfernen“ mit Bestätigungsdialog.
 
 ## Partner koppeln
@@ -46,6 +46,7 @@ Screen unter „Nachricht formulieren“:
 6. Beim Senden wird der aktuelle Text Ende-zu-Ende verschlüsselt an den Partner über den Server übertragen.
 7. Lehnt der Empfänger-Vermittler die Nachricht ab, kommt eine verschlüsselte Ablehnung zurück: Ein Sender-Coach hilft bei der Überarbeitung, die Verhandlung geht automatisch weiter. Nach mehreren Ablehnungen derselben Nachricht erscheint ein Hinweisbanner (keine Sperre).
 8. Der Vermittler merkt sich private, gerätelokale Notizen über die Beziehung, die nie angezeigt werden und den nächsten Gesprächen als Kontext dienen.
+9. Fehleranzeige bei fehlendem/ungültigem API-Schlüssel, fehlender Partner-Kopplung, Netzwerkproblemen, überlasteten Gemini-Servern (HTTP 503) und von Gemini aus Sicherheitsgründen blockierten Antworten – jeweils mit passender Handlungsempfehlung statt einer generischen Fehlermeldung.
 
 ## Nachrichten von deinem Partner (Empfang)
 

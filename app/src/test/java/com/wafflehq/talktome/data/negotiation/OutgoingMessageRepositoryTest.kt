@@ -200,6 +200,22 @@ class OutgoingMessageRepositoryTest {
     }
 
     @Test
+    fun `startNegotiation prefers service unavailable over network when friend opinions fail for mixed reasons`() = runTest {
+        coEvery { outgoingMessageDao.getById(1L) } returns draft()
+        coEvery { secureApiKeyStore.getApiKey() } returns "key"
+        var callIndex = 0
+        coEvery { geminiClient.generateContent(any(), any(), any(), any(), any()) } answers {
+            callIndex++
+            val reason = if (callIndex == 1) GeminiErrorReason.SERVICE_UNAVAILABLE else GeminiErrorReason.NETWORK
+            GeminiGenerateContentResult.Error(reason)
+        }
+
+        val result = repository.startNegotiation(1L)
+
+        assertEquals(OutgoingActionResult.Failure(OutgoingActionErrorReason.SERVICE_UNAVAILABLE), result)
+    }
+
+    @Test
     fun `startNegotiation reports an invalid api key instead of a generic network error`() = runTest {
         coEvery { outgoingMessageDao.getById(1L) } returns draft()
         coEvery { secureApiKeyStore.getApiKey() } returns "key"
@@ -209,6 +225,36 @@ class OutgoingMessageRepositoryTest {
         val result = repository.startNegotiation(1L)
 
         assertEquals(OutgoingActionResult.Failure(OutgoingActionErrorReason.INVALID_API_KEY), result)
+    }
+
+    @Test
+    fun `startNegotiation reports service unavailable when gemini is overloaded`() = runTest {
+        coEvery { outgoingMessageDao.getById(1L) } returns draft()
+        coEvery { secureApiKeyStore.getApiKey() } returns "key"
+        coEvery { geminiClient.generateContent(any(), any(), any(), any(), any()) } returns
+            GeminiGenerateContentResult.Error(GeminiErrorReason.SERVICE_UNAVAILABLE)
+
+        val result = repository.startNegotiation(1L)
+
+        assertEquals(OutgoingActionResult.Failure(OutgoingActionErrorReason.SERVICE_UNAVAILABLE), result)
+    }
+
+    @Test
+    fun `startNegotiation reports blocked by safety filter when the mediator summary is blocked`() = runTest {
+        coEvery { outgoingMessageDao.getById(1L) } returns draft()
+        coEvery { secureApiKeyStore.getApiKey() } returns "key"
+        coEvery { geminiClient.generateContent(any(), any(), any(), any(), any()) } answers {
+            val systemInstruction = secondArg<String>()
+            if (systemInstruction.contains("neutraler Vermittler. Eine Person will")) {
+                GeminiGenerateContentResult.Error(GeminiErrorReason.BLOCKED_BY_SAFETY_FILTER)
+            } else {
+                GeminiGenerateContentResult.Success("Meinung")
+            }
+        }
+
+        val result = repository.startNegotiation(1L)
+
+        assertEquals(OutgoingActionResult.Failure(OutgoingActionErrorReason.BLOCKED_BY_SAFETY_FILTER), result)
     }
 
     @Test
