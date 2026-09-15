@@ -163,7 +163,7 @@ class GeminiClient(
         const val TAG = "GeminiClient"
         const val BASE_URL = "https://generativelanguage.googleapis.com/v1beta"
         const val API_KEY_HEADER = "x-goog-api-key"
-        const val DEFAULT_MODEL = "gemini-2.0-flash"
+        const val DEFAULT_MODEL = "gemini-3.8-flash"
         const val MAX_INPUT_CHARACTERS = 100_000
         const val MAX_RETRIES = 2
         const val INITIAL_BACKOFF_MILLIS = 500L
