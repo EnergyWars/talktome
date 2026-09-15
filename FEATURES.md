@@ -14,14 +14,13 @@ Es gibt aktuell genau ein Profil pro Gerät (kein Verwalten mehrerer Partner, si
 
 ## Gemini-Verbindung
 
-Screen unter „Gemini-Verbindung“. Der Nutzer trägt seinen eigenen Gemini-API-Schlüssel ein:
+Screen unter „Gemini-Verbindung“. Der Nutzer trägt seinen eigenen Gemini-API-Schlüssel ein und wählt das verwendete Gemini-Modell:
 
-- Eingabefeld mit Ein-/Ausblenden-Funktion (wie ein Passwortfeld).
-- „Speichern & testen“ prüft den Schlüssel per echtem API-Aufruf, bevor er gespeichert wird.
+- **Modellauswahl**: Dropdown mit Pro (höchste Qualität), Flash (empfohlen, Standard) und Flash-Lite (am schnellsten). Immer sichtbar, unabhängig vom Schlüssel-Status. Die Wahl wird gespeichert und gilt für alle KI-Aufrufe der App (Vermittler, Berater, Notizen, Frust ablassen).
+- **API-Schlüssel**: Solange ein Schlüssel hinterlegt ist, zeigt der Screen nur einen Hinweis „Schlüssel hinterlegt“ und den Button „Schlüssel entfernen“ (mit Bestätigungsdialog) – kein Eingabefeld. Erst nach dem Entfernen erscheint wieder ein Eingabefeld mit Ein-/Ausblenden-Funktion (wie ein Passwortfeld) und „Speichern & testen“, das den neuen Schlüssel per echtem API-Aufruf prüft, bevor er gespeichert wird.
 - Der Schlüssel wird ausschließlich verschlüsselt auf dem Gerät gespeichert (Android Keystore), niemals im Klartext.
 - Ein Hinweisbanner erklärt, dass Texte zur Verarbeitung an Google Gemini gesendet werden, aber nie an den Partner oder einen Server dieser App.
 - Fehleranzeige für ungültigen Schlüssel, Rate-Limit, fehlende Internetverbindung und überlastete Gemini-Server (HTTP 503, mit Hinweis, es später erneut zu versuchen).
-- „Schlüssel entfernen“ mit Bestätigungsdialog.
 
 ## Partner koppeln
 
