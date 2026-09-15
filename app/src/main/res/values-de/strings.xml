@@ -41,9 +41,14 @@
     <string name="gemini_key_label">Gemini API-Schlüssel</string>
     <string name="gemini_key_toggle_visibility">Schlüssel ein-/ausblenden</string>
     <string name="gemini_key_set_title">Schlüssel hinterlegt</string>
-    <string name="gemini_key_set_body">Es ist bereits ein API-Schlüssel gespeichert. Trage einen neuen ein, um ihn zu ersetzen.</string>
+    <string name="gemini_key_set_body">Es ist bereits ein API-Schlüssel gespeichert. Entferne ihn, um einen anderen einzutragen.</string>
     <string name="gemini_action_save_and_test">Speichern &amp; testen</string>
     <string name="gemini_action_remove_key">Schlüssel entfernen</string>
+    <string name="gemini_model_group">Modell</string>
+    <string name="gemini_model_label">Gemini-Modell</string>
+    <string name="gemini_model_pro">Pro (höchste Qualität)</string>
+    <string name="gemini_model_flash">Flash (empfohlen)</string>
+    <string name="gemini_model_flash_lite">Flash-Lite (am schnellsten)</string>
     <string name="gemini_test_in_progress">Verbindung wird geprüft …</string>
     <string name="gemini_test_success_title">Verbindung erfolgreich</string>
     <string name="gemini_test_success_body">Der Schlüssel wurde geprüft und sicher gespeichert.</string>

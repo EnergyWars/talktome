@@ -13,6 +13,7 @@ import com.wafflehq.talktome.data.db.PartnerEntity
 import com.wafflehq.talktome.data.gemini.GeminiClient
 import com.wafflehq.talktome.data.gemini.GeminiErrorReason
 import com.wafflehq.talktome.data.gemini.GeminiGenerateContentResult
+import com.wafflehq.talktome.data.gemini.GeminiModel
 import com.wafflehq.talktome.data.network.MailboxApi
 import com.wafflehq.talktome.data.network.MailboxItemDto
 import com.wafflehq.talktome.data.network.MailboxItemOutcome
@@ -24,6 +25,7 @@ import com.wafflehq.talktome.data.network.RejectionEnvelope
 import com.wafflehq.talktome.data.profile.Profile
 import com.wafflehq.talktome.data.profile.ProfileRepository
 import com.wafflehq.talktome.data.security.SecureApiKeyStore
+import com.wafflehq.talktome.data.settings.SettingsRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -48,6 +50,7 @@ class InboxRepositoryTest {
     private lateinit var mailboxApi: MailboxApi
     private lateinit var ownIdentity: E2eIdentity
     private lateinit var senderIdentity: E2eIdentity
+    private lateinit var settingsRepository: SettingsRepository
     private lateinit var repository: InboxRepository
 
     private val item = MailboxItemDto(messageId = "m1", senderDeviceId = "sender-device", kind = "MESSAGE", ciphertext = "", createdAt = 1L)
@@ -65,8 +68,10 @@ class InboxRepositoryTest {
         ownIdentity = E2eIdentity(KeysetHandle.generateNew(KeyTemplates.get(E2eIdentity.HYBRID_KEY_TEMPLATE_NAME)))
         senderIdentity = E2eIdentity(KeysetHandle.generateNew(KeyTemplates.get(E2eIdentity.HYBRID_KEY_TEMPLATE_NAME)))
 
+        settingsRepository = mockk()
         every { profileRepository.profile } returns flowOf(Profile.Empty.copy(filterText = "keine Vorwürfe"))
         every { mediatorNoteDao.observeByRole(any()) } returns flowOf(emptyList())
+        every { settingsRepository.geminiModel } returns flowOf(GeminiModel.DEFAULT)
 
         repository = InboxRepository(
             inboxMessageDao,
@@ -77,6 +82,7 @@ class InboxRepositoryTest {
             partnerDao,
             mailboxApi,
             ownIdentity,
+            settingsRepository,
         )
     }
 

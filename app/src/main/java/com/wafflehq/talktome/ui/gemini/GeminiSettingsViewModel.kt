@@ -4,7 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.wafflehq.talktome.data.gemini.GeminiClient
 import com.wafflehq.talktome.data.gemini.GeminiConnectionResult
+import com.wafflehq.talktome.data.gemini.GeminiModel
 import com.wafflehq.talktome.data.security.SecureApiKeyStore
+import com.wafflehq.talktome.data.settings.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -32,12 +34,19 @@ data class GeminiSettingsUiState(
 class GeminiSettingsViewModel @Inject constructor(
     private val secureApiKeyStore: SecureApiKeyStore,
     private val geminiClient: GeminiClient,
+    private val settingsRepository: SettingsRepository,
 ) : ViewModel() {
 
     val hasApiKey: StateFlow<Boolean> = secureApiKeyStore.hasApiKey.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
         initialValue = false,
+    )
+
+    val selectedModel: StateFlow<GeminiModel> = settingsRepository.geminiModel.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = GeminiModel.DEFAULT,
     )
 
     private val _uiState = MutableStateFlow(GeminiSettingsUiState())
@@ -70,6 +79,12 @@ class GeminiSettingsViewModel @Inject constructor(
                 }
                 else -> _uiState.update { it.copy(connectionState = GeminiConnectionUiState.Failed(result)) }
             }
+        }
+    }
+
+    fun onModelSelected(model: GeminiModel) {
+        viewModelScope.launch {
+            settingsRepository.setGeminiModel(model)
         }
     }
 

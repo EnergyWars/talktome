@@ -13,6 +13,7 @@ import com.wafflehq.talktome.data.prompts.MediatorPrompts
 import com.wafflehq.talktome.data.prompts.NotesContext
 import com.wafflehq.talktome.data.prompts.PromptBuilder
 import com.wafflehq.talktome.data.security.SecureApiKeyStore
+import com.wafflehq.talktome.data.settings.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -41,6 +42,7 @@ class VentingViewModel @Inject constructor(
     private val secureApiKeyStore: SecureApiKeyStore,
     private val geminiClient: GeminiClient,
     private val mediatorNoteDao: MediatorNoteDao,
+    private val settingsRepository: SettingsRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(VentingUiState())
@@ -66,7 +68,8 @@ class VentingViewModel @Inject constructor(
                 GeminiTurn(if (it.fromUser) GeminiRole.USER else GeminiRole.MODEL, it.text)
             }
             val systemInstruction = NotesContext.append(MediatorPrompts.ventingCompanion(), notes)
-            when (val result = geminiClient.generateContent(apiKey, systemInstruction, PromptBuilder.wrapUserMessage(text), history = history)) {
+            val model = settingsRepository.geminiModel.first().wireId
+            when (val result = geminiClient.generateContent(apiKey, systemInstruction, PromptBuilder.wrapUserMessage(text), model = model, history = history)) {
                 is GeminiGenerateContentResult.Success ->
                     _uiState.update { it.copy(turns = it.turns + VentingTurn(fromUser = false, text = result.text), isSending = false) }
                 is GeminiGenerateContentResult.Error ->
@@ -85,7 +88,8 @@ class VentingViewModel @Inject constructor(
             val apiKey = secureApiKeyStore.getApiKey()
             if (apiKey != null) {
                 val transcript = turns.joinToString("\n") { turn -> "${if (turn.fromUser) "Ich" else "Begleiter"}: ${turn.text}" }
-                val result = geminiClient.generateContent(apiKey, MediatorPrompts.noteTaker(MediatorAgentRole.VENTING_COMPANION), PromptBuilder.wrapUserMessage(transcript))
+                val model = settingsRepository.geminiModel.first().wireId
+                val result = geminiClient.generateContent(apiKey, MediatorPrompts.noteTaker(MediatorAgentRole.VENTING_COMPANION), PromptBuilder.wrapUserMessage(transcript), model = model)
                 if (result is GeminiGenerateContentResult.Success) {
                     mediatorNoteDao.insert(MediatorNoteEntity(role = MediatorAgentRole.VENTING_COMPANION, noteText = result.text, createdAt = System.currentTimeMillis()))
                 }

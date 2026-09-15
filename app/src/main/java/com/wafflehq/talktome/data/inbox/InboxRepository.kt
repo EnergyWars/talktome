@@ -24,6 +24,7 @@ import com.wafflehq.talktome.data.prompts.MediatorPrompts
 import com.wafflehq.talktome.data.prompts.NotesContext
 import com.wafflehq.talktome.data.prompts.PromptBuilder
 import com.wafflehq.talktome.data.security.SecureApiKeyStore
+import com.wafflehq.talktome.data.settings.SettingsRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.json.Json
@@ -41,6 +42,7 @@ class InboxRepository @Inject constructor(
     private val partnerDao: PartnerDao,
     private val mailboxApi: MailboxApi,
     private val e2eIdentity: E2eIdentity,
+    private val settingsRepository: SettingsRepository,
 ) {
     private val json = Json { ignoreUnknownKeys = true }
 
@@ -67,7 +69,8 @@ class InboxRepository @Inject constructor(
         val filterText = profileRepository.profile.first().filterText
         val notes = mediatorNoteDao.observeByRole(MediatorAgentRole.RECEIVER_GATEKEEPER).first()
         val systemInstruction = NotesContext.append(MediatorPrompts.receiverGatekeeper(filterText), notes)
-        val result = geminiClient.generateContent(apiKey, systemInstruction, PromptBuilder.wrapUserMessage(envelope.text))
+        val model = settingsRepository.geminiModel.first().wireId
+        val result = geminiClient.generateContent(apiKey, systemInstruction, PromptBuilder.wrapUserMessage(envelope.text), model = model)
         val rawText = (result as? GeminiGenerateContentResult.Success)?.text ?: return MailboxItemOutcome.RETRY_LATER
         val verdict = GatekeeperVerdict.parse(rawText)
 
@@ -107,7 +110,8 @@ class InboxRepository @Inject constructor(
 
     private suspend fun writeNote(role: MediatorAgentRole, transcript: String) {
         val apiKey = secureApiKeyStore.getApiKey() ?: return
-        val result = geminiClient.generateContent(apiKey, MediatorPrompts.noteTaker(role), PromptBuilder.wrapUserMessage(transcript))
+        val model = settingsRepository.geminiModel.first().wireId
+        val result = geminiClient.generateContent(apiKey, MediatorPrompts.noteTaker(role), PromptBuilder.wrapUserMessage(transcript), model = model)
         if (result is GeminiGenerateContentResult.Success) {
             mediatorNoteDao.insert(MediatorNoteEntity(role = role, noteText = result.text, createdAt = System.currentTimeMillis()))
         }

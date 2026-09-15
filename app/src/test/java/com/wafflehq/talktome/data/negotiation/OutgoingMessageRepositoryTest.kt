@@ -20,6 +20,7 @@ import com.wafflehq.talktome.data.db.PartnerEntity
 import com.wafflehq.talktome.data.gemini.GeminiClient
 import com.wafflehq.talktome.data.gemini.GeminiErrorReason
 import com.wafflehq.talktome.data.gemini.GeminiGenerateContentResult
+import com.wafflehq.talktome.data.gemini.GeminiModel
 import com.wafflehq.talktome.data.network.MailboxApi
 import com.wafflehq.talktome.data.network.MailboxErrorReason
 import com.wafflehq.talktome.data.network.MailboxItemOutcome
@@ -30,6 +31,7 @@ import com.wafflehq.talktome.data.network.RejectionEnvelope
 import com.wafflehq.talktome.data.profile.Profile
 import com.wafflehq.talktome.data.profile.ProfileRepository
 import com.wafflehq.talktome.data.security.SecureApiKeyStore
+import com.wafflehq.talktome.data.settings.SettingsRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -58,6 +60,7 @@ class OutgoingMessageRepositoryTest {
     private lateinit var deviceIdentityStore: DeviceIdentityStore
     private lateinit var senderIdentity: E2eIdentity
     private lateinit var recipientIdentity: E2eIdentity
+    private lateinit var settingsRepository: SettingsRepository
     private lateinit var repository: OutgoingMessageRepository
 
     @Before
@@ -75,9 +78,11 @@ class OutgoingMessageRepositoryTest {
         senderIdentity = E2eIdentity(KeysetHandle.generateNew(KeyTemplates.get(E2eIdentity.HYBRID_KEY_TEMPLATE_NAME)))
         recipientIdentity = E2eIdentity(KeysetHandle.generateNew(KeyTemplates.get(E2eIdentity.HYBRID_KEY_TEMPLATE_NAME)))
 
+        settingsRepository = mockk()
         every { profileRepository.profile } returns flowOf(Profile.Empty)
         every { mediatorNoteDao.observeByRole(any()) } returns flowOf(emptyList())
         every { negotiationTurnDao.observeForMessage(any()) } returns flowOf(emptyList())
+        every { settingsRepository.geminiModel } returns flowOf(GeminiModel.DEFAULT)
 
         repository = OutgoingMessageRepository(
             outgoingMessageDao,
@@ -90,6 +95,7 @@ class OutgoingMessageRepositoryTest {
             mailboxApi,
             deviceIdentityStore,
             senderIdentity,
+            settingsRepository,
         )
     }
 

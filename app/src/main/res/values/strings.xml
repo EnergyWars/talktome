@@ -41,9 +41,14 @@
     <string name="gemini_key_label">Gemini API key</string>
     <string name="gemini_key_toggle_visibility">Show/hide key</string>
     <string name="gemini_key_set_title">Key stored</string>
-    <string name="gemini_key_set_body">An API key is already stored. Enter a new one to replace it.</string>
+    <string name="gemini_key_set_body">An API key is already stored. Remove it to enter a different one.</string>
     <string name="gemini_action_save_and_test">Save &amp; test</string>
     <string name="gemini_action_remove_key">Remove key</string>
+    <string name="gemini_model_group">Model</string>
+    <string name="gemini_model_label">Gemini model</string>
+    <string name="gemini_model_pro">Pro (highest quality)</string>
+    <string name="gemini_model_flash">Flash (recommended)</string>
+    <string name="gemini_model_flash_lite">Flash-Lite (fastest)</string>
     <string name="gemini_test_in_progress">Testing connection …</string>
     <string name="gemini_test_success_title">Connection successful</string>
     <string name="gemini_test_success_body">The key was verified and stored securely.</string>

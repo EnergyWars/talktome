@@ -6,7 +6,9 @@ import com.wafflehq.talktome.data.db.MediatorNoteEntity
 import com.wafflehq.talktome.data.gemini.GeminiClient
 import com.wafflehq.talktome.data.gemini.GeminiErrorReason
 import com.wafflehq.talktome.data.gemini.GeminiGenerateContentResult
+import com.wafflehq.talktome.data.gemini.GeminiModel
 import com.wafflehq.talktome.data.security.SecureApiKeyStore
+import com.wafflehq.talktome.data.settings.SettingsRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -29,6 +31,7 @@ class VentingViewModelTest {
     private lateinit var secureApiKeyStore: SecureApiKeyStore
     private lateinit var geminiClient: GeminiClient
     private lateinit var mediatorNoteDao: MediatorNoteDao
+    private lateinit var settingsRepository: SettingsRepository
 
     @Before
     fun setUp() {
@@ -36,7 +39,9 @@ class VentingViewModelTest {
         secureApiKeyStore = mockk()
         geminiClient = mockk()
         mediatorNoteDao = mockk(relaxed = true)
+        settingsRepository = mockk()
         every { mediatorNoteDao.observeByRole(any()) } returns flowOf(emptyList())
+        every { settingsRepository.geminiModel } returns flowOf(GeminiModel.DEFAULT)
     }
 
     @After
@@ -44,7 +49,7 @@ class VentingViewModelTest {
         Dispatchers.resetMain()
     }
 
-    private fun viewModel() = VentingViewModel(secureApiKeyStore, geminiClient, mediatorNoteDao)
+    private fun viewModel() = VentingViewModel(secureApiKeyStore, geminiClient, mediatorNoteDao, settingsRepository)
 
     @Test
     fun `sending blank input does nothing`() = runTest(dispatcher) {

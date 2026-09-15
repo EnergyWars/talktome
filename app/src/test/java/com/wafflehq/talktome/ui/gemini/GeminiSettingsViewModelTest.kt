@@ -2,7 +2,9 @@ package com.wafflehq.talktome.ui.gemini
 
 import com.wafflehq.talktome.data.gemini.GeminiClient
 import com.wafflehq.talktome.data.gemini.GeminiConnectionResult
+import com.wafflehq.talktome.data.gemini.GeminiModel
 import com.wafflehq.talktome.data.security.SecureApiKeyStore
+import com.wafflehq.talktome.data.settings.SettingsRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -23,13 +25,16 @@ class GeminiSettingsViewModelTest {
     private val dispatcher = StandardTestDispatcher()
     private lateinit var secureApiKeyStore: SecureApiKeyStore
     private lateinit var geminiClient: GeminiClient
+    private lateinit var settingsRepository: SettingsRepository
 
     @Before
     fun setUp() {
         Dispatchers.setMain(dispatcher)
         secureApiKeyStore = mockk(relaxed = true)
         geminiClient = mockk()
+        settingsRepository = mockk(relaxed = true)
         every { secureApiKeyStore.hasApiKey } returns flowOf(false)
+        every { settingsRepository.geminiModel } returns flowOf(GeminiModel.DEFAULT)
     }
 
     @After
@@ -37,7 +42,7 @@ class GeminiSettingsViewModelTest {
         Dispatchers.resetMain()
     }
 
-    private fun viewModel() = GeminiSettingsViewModel(secureApiKeyStore, geminiClient)
+    private fun viewModel() = GeminiSettingsViewModel(secureApiKeyStore, geminiClient, settingsRepository)
 
     @Test
     fun `saving a blank key fails without calling the client`() = runTest(dispatcher) {
@@ -114,5 +119,24 @@ class GeminiSettingsViewModelTest {
         vm.onToggleVisibility()
 
         assertEquals(true, vm.uiState.value.isKeyVisible)
+    }
+
+    @Test
+    fun `selectedModel reflects the repository value`() = runTest(dispatcher) {
+        every { settingsRepository.geminiModel } returns flowOf(GeminiModel.PRO)
+        val vm = viewModel()
+        dispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals(GeminiModel.PRO, vm.selectedModel.value)
+    }
+
+    @Test
+    fun `onModelSelected persists the chosen model`() = runTest(dispatcher) {
+        val vm = viewModel()
+
+        vm.onModelSelected(GeminiModel.FLASH_LITE)
+        dispatcher.scheduler.advanceUntilIdle()
+
+        coVerify { settingsRepository.setGeminiModel(GeminiModel.FLASH_LITE) }
     }
 }

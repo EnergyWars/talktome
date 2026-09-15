@@ -27,12 +27,15 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.wafflehq.talktome.R
 import com.wafflehq.talktome.data.gemini.GeminiConnectionResult
+import com.wafflehq.talktome.data.gemini.GeminiModel
 import com.wafflehq.uikit.components.AppBanner
 import com.wafflehq.uikit.components.AppButton
 import com.wafflehq.uikit.components.AppDialog
 import com.wafflehq.uikit.components.AppIconButton
 import com.wafflehq.uikit.components.AppTextField
 import com.wafflehq.uikit.components.ButtonVariant
+import com.wafflehq.uikit.components.SettingsDropdownField
+import com.wafflehq.uikit.components.SettingsGroup
 import com.wafflehq.uikit.components.SettingsScaffold
 import com.wafflehq.uikit.theme.AppRole
 import com.wafflehq.uikit.theme.AppSpacing
@@ -44,7 +47,10 @@ fun GeminiSettingsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val hasApiKey by viewModel.hasApiKey.collectAsStateWithLifecycle()
+    val selectedModel by viewModel.selectedModel.collectAsStateWithLifecycle()
     var showClearDialog by remember { mutableStateOf(false) }
+    val models = GeminiModel.entries
+    val modelLabels = models.map { geminiModelLabel(it) }
 
     SettingsScaffold(
         title = stringResource(R.string.settings_row_gemini),
@@ -65,70 +71,82 @@ fun GeminiSettingsScreen(
                 role = AppRole.Primary,
             )
 
+            SettingsGroup(
+                label = stringResource(R.string.gemini_model_group),
+                tint = AppRole.Primary,
+                fraction = 0.08f,
+            ) {
+                SettingsDropdownField(
+                    label = stringResource(R.string.gemini_model_label),
+                    value = geminiModelLabel(selectedModel),
+                    options = modelLabels,
+                    selectedIndex = models.indexOf(selectedModel),
+                    onSelect = { index -> viewModel.onModelSelected(models[index]) },
+                )
+            }
+
             if (hasApiKey) {
                 AppBanner(
                     title = stringResource(R.string.gemini_key_set_title),
                     body = stringResource(R.string.gemini_key_set_body),
                     role = AppRole.Success,
                 )
-            }
 
-            AppTextField(
-                value = uiState.apiKeyInput,
-                onValueChange = viewModel::onApiKeyInputChanged,
-                label = stringResource(R.string.gemini_key_label),
-                role = AppRole.Primary,
-                singleLine = true,
-                visualTransformation = if (uiState.isKeyVisible) {
-                    VisualTransformation.None
-                } else {
-                    PasswordVisualTransformation()
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                trailingIcon = {
-                    AppIconButton(
-                        icon = if (uiState.isKeyVisible) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility,
-                        contentDescription = stringResource(R.string.gemini_key_toggle_visibility),
-                        role = AppRole.Neutral,
-                        onClick = viewModel::onToggleVisibility,
-                    )
-                },
-                supportingText = connectionSupportingText(uiState.connectionState),
-                isError = uiState.connectionState is GeminiConnectionUiState.Failed,
-                modifier = Modifier.fillMaxWidth(),
-            )
-
-            when (val connectionState = uiState.connectionState) {
-                GeminiConnectionUiState.Success -> AppBanner(
-                    title = stringResource(R.string.gemini_test_success_title),
-                    body = stringResource(R.string.gemini_test_success_body),
-                    role = AppRole.Success,
-                    icon = Icons.Outlined.CheckCircle,
-                )
-                is GeminiConnectionUiState.Failed -> AppBanner(
-                    title = stringResource(R.string.gemini_test_failed_title),
-                    body = connectionErrorBody(connectionState.result),
-                    role = AppRole.Error,
-                    icon = Icons.Outlined.Error,
-                )
-                else -> Unit
-            }
-
-            AppButton(
-                text = stringResource(R.string.gemini_action_save_and_test),
-                role = AppRole.Primary,
-                variant = ButtonVariant.Tonal,
-                onClick = viewModel::onSaveAndTest,
-                enabled = uiState.connectionState != GeminiConnectionUiState.Testing,
-                modifier = Modifier.fillMaxWidth(),
-            )
-
-            if (hasApiKey) {
                 AppButton(
                     text = stringResource(R.string.gemini_action_remove_key),
                     role = AppRole.Error,
                     variant = ButtonVariant.Text,
                     onClick = { showClearDialog = true },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            } else {
+                AppTextField(
+                    value = uiState.apiKeyInput,
+                    onValueChange = viewModel::onApiKeyInputChanged,
+                    label = stringResource(R.string.gemini_key_label),
+                    role = AppRole.Primary,
+                    singleLine = true,
+                    visualTransformation = if (uiState.isKeyVisible) {
+                        VisualTransformation.None
+                    } else {
+                        PasswordVisualTransformation()
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    trailingIcon = {
+                        AppIconButton(
+                            icon = if (uiState.isKeyVisible) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility,
+                            contentDescription = stringResource(R.string.gemini_key_toggle_visibility),
+                            role = AppRole.Neutral,
+                            onClick = viewModel::onToggleVisibility,
+                        )
+                    },
+                    supportingText = connectionSupportingText(uiState.connectionState),
+                    isError = uiState.connectionState is GeminiConnectionUiState.Failed,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+
+                when (val connectionState = uiState.connectionState) {
+                    GeminiConnectionUiState.Success -> AppBanner(
+                        title = stringResource(R.string.gemini_test_success_title),
+                        body = stringResource(R.string.gemini_test_success_body),
+                        role = AppRole.Success,
+                        icon = Icons.Outlined.CheckCircle,
+                    )
+                    is GeminiConnectionUiState.Failed -> AppBanner(
+                        title = stringResource(R.string.gemini_test_failed_title),
+                        body = connectionErrorBody(connectionState.result),
+                        role = AppRole.Error,
+                        icon = Icons.Outlined.Error,
+                    )
+                    else -> Unit
+                }
+
+                AppButton(
+                    text = stringResource(R.string.gemini_action_save_and_test),
+                    role = AppRole.Primary,
+                    variant = ButtonVariant.Tonal,
+                    onClick = viewModel::onSaveAndTest,
+                    enabled = uiState.connectionState != GeminiConnectionUiState.Testing,
                     modifier = Modifier.fillMaxWidth(),
                 )
             }
@@ -150,6 +168,13 @@ fun GeminiSettingsScreen(
             onDismiss = { showClearDialog = false },
         )
     }
+}
+
+@Composable
+private fun geminiModelLabel(model: GeminiModel): String = when (model) {
+    GeminiModel.PRO -> stringResource(R.string.gemini_model_pro)
+    GeminiModel.FLASH -> stringResource(R.string.gemini_model_flash)
+    GeminiModel.FLASH_LITE -> stringResource(R.string.gemini_model_flash_lite)
 }
 
 @Composable

@@ -33,6 +33,7 @@ import com.wafflehq.talktome.data.prompts.MediatorPrompts
 import com.wafflehq.talktome.data.prompts.NotesContext
 import com.wafflehq.talktome.data.prompts.PromptBuilder
 import com.wafflehq.talktome.data.security.SecureApiKeyStore
+import com.wafflehq.talktome.data.settings.SettingsRepository
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -72,6 +73,7 @@ class OutgoingMessageRepository @Inject constructor(
     private val mailboxApi: MailboxApi,
     private val deviceIdentityStore: DeviceIdentityStore,
     private val e2eIdentity: E2eIdentity,
+    private val settingsRepository: SettingsRepository,
 ) {
     private val json = Json { ignoreUnknownKeys = true }
     private val opinionsSerializer = ListSerializer(FriendOpinion.serializer())
@@ -116,6 +118,7 @@ class OutgoingMessageRepository @Inject constructor(
             }
         val profile = profileRepository.profile.first()
         val context = MediatorContext(selfDescription = profile.selfDescription, partnerDescription = profile.partnerDescription)
+        val model = settingsRepository.geminiModel.first().wireId
 
         val opinionResults = coroutineScope {
             listOf(
@@ -124,7 +127,7 @@ class OutgoingMessageRepository @Inject constructor(
                 LABEL_SENDER_FRIENDS_WITHOUT_CONTEXT to MediatorPrompts.selfAdvisor(MediatorContext()),
                 LABEL_SENDER_FRIENDS_WITH_CONTEXT to MediatorPrompts.selfAdvisor(context),
             ).map { (label, systemInstruction) ->
-                async { label to geminiClient.generateContent(apiKey, systemInstruction, PromptBuilder.wrapUserMessage(message.draftText)) }
+                async { label to geminiClient.generateContent(apiKey, systemInstruction, PromptBuilder.wrapUserMessage(message.draftText), model = model) }
             }.awaitAll()
         }
         val opinions = opinionResults.mapNotNull { (label, result) ->
@@ -140,7 +143,7 @@ class OutgoingMessageRepository @Inject constructor(
         val notes = mediatorNoteDao.observeByRole(MediatorAgentRole.NEUTRAL_MEDIATOR).first()
         val systemInstruction = NotesContext.append(MediatorPrompts.neutralMediator(), notes)
         val userContent = PromptBuilder.neutralMediatorUserContent(message.draftText, opinions)
-        val summaryResult = geminiClient.generateContent(apiKey, systemInstruction, userContent)
+        val summaryResult = geminiClient.generateContent(apiKey, systemInstruction, userContent, model = model)
         val summaryText = (summaryResult as? GeminiGenerateContentResult.Success)?.text
             ?: run {
                 val reason = (summaryResult as GeminiGenerateContentResult.Error).reason
@@ -183,7 +186,8 @@ class OutgoingMessageRepository @Inject constructor(
         }
         val notes = mediatorNoteDao.observeByRole(MediatorAgentRole.NEUTRAL_MEDIATOR).first()
         val systemInstruction = NotesContext.append(MediatorPrompts.neutralMediator(), notes)
-        val result = geminiClient.generateContent(apiKey, systemInstruction, PromptBuilder.wrapUserMessage(userText), history = history)
+        val model = settingsRepository.geminiModel.first().wireId
+        val result = geminiClient.generateContent(apiKey, systemInstruction, PromptBuilder.wrapUserMessage(userText), model = model, history = history)
         val replyText = (result as? GeminiGenerateContentResult.Success)?.text
             ?: run {
                 val reason = (result as GeminiGenerateContentResult.Error).reason
@@ -264,7 +268,8 @@ class OutgoingMessageRepository @Inject constructor(
 
         val notes = mediatorNoteDao.observeByRole(MediatorAgentRole.SENDER_COACH).first()
         val systemInstruction = NotesContext.append(MediatorPrompts.senderCoach(), notes)
-        val result = geminiClient.generateContent(apiKey, systemInstruction, PromptBuilder.wrapUserMessage(envelope.feedback))
+        val model = settingsRepository.geminiModel.first().wireId
+        val result = geminiClient.generateContent(apiKey, systemInstruction, PromptBuilder.wrapUserMessage(envelope.feedback), model = model)
         val coachText = (result as? GeminiGenerateContentResult.Success)?.text ?: FALLBACK_COACH_MESSAGE
 
         val now = System.currentTimeMillis()
@@ -287,7 +292,8 @@ class OutgoingMessageRepository @Inject constructor(
         val apiKey = secureApiKeyStore.getApiKey() ?: return
         val transcript = negotiationTurnDao.getForMessage(messageId).joinToString("\n") { "${it.sender}: ${it.text}" }
         if (transcript.isBlank()) return
-        val result = geminiClient.generateContent(apiKey, MediatorPrompts.noteTaker(role), PromptBuilder.wrapUserMessage(transcript))
+        val model = settingsRepository.geminiModel.first().wireId
+        val result = geminiClient.generateContent(apiKey, MediatorPrompts.noteTaker(role), PromptBuilder.wrapUserMessage(transcript), model = model)
         if (result is GeminiGenerateContentResult.Success) {
             mediatorNoteDao.insert(MediatorNoteEntity(role = role, noteText = result.text, createdAt = System.currentTimeMillis()))
         }
