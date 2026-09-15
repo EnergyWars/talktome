@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="label_settings">Settings</string>
+    <string name="header_menu">Menu</string>
+    <string name="header_home">Home</string>
+    <string name="textarea_error">Invalid input</string>
+</resources>

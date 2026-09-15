@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TalkToMe</string>
+    <string name="label_back">Back</string>
+    <string name="label_cancel">Cancel</string>
+
+    <string name="drawer_section_configuration">Configuration</string>
+    <string name="drawer_section_talk">Talk</string>
+
+    <string name="home_intro_title">Welcome to TalkToMe</string>
+    <string name="home_intro_body">TalkToMe helps you phrase messages to your partner that are reviewed by AI advisors before they arrive. Start by setting up your profile and your Gemini connection.</string>
+
+    <string name="settings_title">Settings</string>
+    <string name="settings_display_title">Display</string>
+    <string name="settings_display_sub">Light, dark or system default</string>
+    <string name="settings_group_general">General</string>
+    <string name="settings_design_label">Theme</string>
+    <string name="settings_theme_system">System default</string>
+    <string name="settings_theme_light">Light</string>
+    <string name="settings_theme_dark">Dark</string>
+
+    <string name="settings_row_profile">Profile</string>
+    <string name="settings_row_profile_sub">Filter, self and partner description</string>
+    <string name="settings_row_gemini">Gemini connection</string>
+    <string name="settings_row_gemini_sub">Enter and test your API key</string>
+
+    <string name="profile_group_self">ABOUT ME</string>
+    <string name="profile_self_label">Self-description</string>
+    <string name="profile_self_help">How would you describe yourself? The AI advisors use this to better understand your messages.</string>
+
+    <string name="profile_group_partner">ABOUT MY PARTNER</string>
+    <string name="profile_partner_label">Partner description</string>
+    <string name="profile_partner_help">How would you describe your partner? Helps the AI advisors better assess their perspective.</string>
+
+    <string name="profile_group_filter">FILTER</string>
+    <string name="profile_filter_label">What I don\'t want to read</string>
+    <string name="profile_filter_help">Describe what kind of messages could trigger or hurt you. This stays private – your partner never learns the content, only whether a message was rejected because of it.</string>
+
+    <string name="gemini_privacy_title">Important notice</string>
+    <string name="gemini_privacy_body">Your API key is stored encrypted on this device only. Your texts are sent to Google Gemini for processing, but never to your partner or to a server of this app.</string>
+    <string name="gemini_key_label">Gemini API key</string>
+    <string name="gemini_key_toggle_visibility">Show/hide key</string>
+    <string name="gemini_key_set_title">Key stored</string>
+    <string name="gemini_key_set_body">An API key is already stored. Enter a new one to replace it.</string>
+    <string name="gemini_action_save_and_test">Save &amp; test</string>
+    <string name="gemini_action_remove_key">Remove key</string>
+    <string name="gemini_test_in_progress">Testing connection …</string>
+    <string name="gemini_test_success_title">Connection successful</string>
+    <string name="gemini_test_success_body">The key was verified and stored securely.</string>
+    <string name="gemini_test_failed_title">Connection failed</string>
+    <string name="gemini_error_invalid_key">The key is invalid or was rejected.</string>
+    <string name="gemini_error_rate_limited">Too many requests. Please try again later.</string>
+    <string name="gemini_error_network">Could not connect. Check your internet connection.</string>
+    <string name="gemini_error_unknown">Unknown connection error.</string>
+    <string name="gemini_remove_dialog_title">Remove key?</string>
+    <string name="gemini_remove_dialog_body">Without an API key, no messages can be reviewed by the AI until you add a new one.</string>
+
+    <string name="settings_row_pairing">Pair partner</string>
+    <string name="settings_row_pairing_sub">Create or enter an invite code</string>
+    <string name="pairing_title">Pair partner</string>
+    <string name="pairing_intro_title">How pairing works</string>
+    <string name="pairing_intro_body">One partner creates an invite code (as a QR code or text); the other enters or pastes it. You will then be connected end-to-end encrypted.</string>
+    <string name="pairing_display_name_label">Your display name</string>
+    <string name="pairing_server_url_label">Server address</string>
+    <string name="pairing_create_invite_title">Create invite</string>
+    <string name="pairing_action_create_invite">Generate invite code</string>
+    <string name="pairing_qr_content_description">Invite QR code</string>
+    <string name="pairing_action_copy_code">Copy code</string>
+    <string name="pairing_accept_invite_title">Accept invite</string>
+    <string name="pairing_enter_code_label">Enter or paste the invite code</string>
+    <string name="pairing_action_accept_invite">Connect partner</string>
+    <string name="pairing_connected_title">Connected to</string>
+    <string name="pairing_action_disconnect">Disconnect partner</string>
+    <string name="pairing_disconnect_dialog_title">Disconnect partner?</string>
+    <string name="pairing_disconnect_dialog_body">You will need to pair again to exchange messages. Your notes are kept.</string>
+    <string name="pairing_error_title">Pairing failed</string>
+    <string name="pairing_error_network">Could not reach the server. Check the server address and your internet connection.</string>
+    <string name="pairing_error_invalid_code">The invite code is invalid or incomplete.</string>
+    <string name="pairing_error_server">The server rejected the request.</string>
+
+    <string name="settings_row_venting">Vent frustration</string>
+    <string name="settings_row_venting_sub">Write freely, nothing gets sent</string>
+    <string name="venting_title">Vent frustration</string>
+    <string name="venting_privacy_title">Stays fully local</string>
+    <string name="venting_privacy_body">This is a space to speak freely. None of it is sent to your partner or a server – only a short private note for the mediator stays on this device afterwards.</string>
+    <string name="venting_input_label">What\'s on your mind?</string>
+    <string name="venting_action_send">Send</string>
+    <string name="venting_action_switch_to_compose">Compose a message instead</string>
+    <string name="venting_error_title">Something went wrong</string>
+    <string name="venting_error_no_api_key">Add a Gemini API key in settings first.</string>
+    <string name="venting_error_network">Could not connect. Please try again later.</string>
+
+    <string name="settings_row_compose">Compose message</string>
+    <string name="settings_row_compose_sub">I want to tell you something</string>
+    <string name="compose_title">Compose message</string>
+    <string name="compose_intro_title">I want to tell you something</string>
+    <string name="compose_intro_body">Write what you want to tell your partner. Several AI advisors give you and your partner\'s profile feedback before you decide whether and how to send it.</string>
+    <string name="compose_draft_label">What do you want to say?</string>
+    <string name="compose_action_start">Get feedback</string>
+    <string name="compose_opinions_title">Advisor opinions</string>
+    <string name="compose_reply_label">Reply to the mediator</string>
+    <string name="compose_action_reply">Reply</string>
+    <string name="compose_action_send_now">Send anyway</string>
+    <string name="compose_sent_title">Message sent</string>
+    <string name="compose_sent_body">Your message was encrypted and delivered to your partner.</string>
+    <string name="compose_error_title">That did not work</string>
+    <string name="compose_error_no_api_key">Add a Gemini API key in settings first.</string>
+    <string name="compose_error_invalid_api_key">Your Gemini API key was rejected. Check it under \"Gemini connection\".</string>
+    <string name="compose_error_no_partner">You are not paired with anyone yet. Set up partner pairing first.</string>
+    <string name="compose_error_network">Could not connect. Please try again later.</string>
+    <string name="compose_error_server">The server rejected the request.</string>
+    <string name="compose_escalation_title">Rejected multiple times</string>
+    <string name="compose_escalation_body">This message has been rejected several times. A break or a completely different approach might help.</string>
+
+    <string name="settings_row_inbox">Messages from your partner</string>
+    <string name="settings_row_inbox_sub">View approved messages</string>
+    <string name="inbox_title">Messages from your partner</string>
+    <string name="inbox_action_refresh">Check for new messages</string>
+    <string name="inbox_action_refreshing">Refreshing …</string>
+    <string name="inbox_empty_title">No messages yet.\nTap \"Check for new messages\" above.</string>
+
+    <string name="settings_row_notes">Mediator notes</string>
+    <string name="settings_row_notes_sub">Reset the notes about your partner</string>
+    <string name="notes_title">Mediator notes</string>
+    <string name="notes_intro_title">Private notes of the AI advisors</string>
+    <string name="notes_intro_body">The AI advisors remember over time what kind of people they are dealing with. These notes never leave your device and you cannot view them – only reset them completely.</string>
+    <string name="notes_action_reset">Reset notes</string>
+    <string name="notes_reset_dialog_title">Reset notes?</string>
+    <string name="notes_reset_dialog_body">All private AI advisor notes about this relationship will be permanently deleted.</string>
+</resources>

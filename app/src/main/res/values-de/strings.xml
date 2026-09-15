@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TalkToMe</string>
+    <string name="label_back">Zurück</string>
+    <string name="label_cancel">Abbrechen</string>
+
+    <string name="drawer_section_configuration">Konfiguration</string>
+    <string name="drawer_section_talk">Austausch</string>
+
+    <string name="home_intro_title">Willkommen bei TalkToMe</string>
+    <string name="home_intro_body">TalkToMe hilft dir, Nachrichten an deinen Partner zu formulieren, die von KI-Beratern gegengelesen werden, bevor sie ankommen. Richte zuerst dein Profil und deine Gemini-Verbindung ein.</string>
+
+    <string name="settings_title">Einstellungen</string>
+    <string name="settings_display_title">Anzeige</string>
+    <string name="settings_display_sub">Hell, dunkel oder Systemeinstellung</string>
+    <string name="settings_group_general">Allgemein</string>
+    <string name="settings_design_label">Design</string>
+    <string name="settings_theme_system">Systemeinstellung</string>
+    <string name="settings_theme_light">Hell</string>
+    <string name="settings_theme_dark">Dunkel</string>
+
+    <string name="settings_row_profile">Profil</string>
+    <string name="settings_row_profile_sub">Filter, Selbst- und Partnerbeschreibung</string>
+    <string name="settings_row_gemini">Gemini-Verbindung</string>
+    <string name="settings_row_gemini_sub">API-Schlüssel eintragen und testen</string>
+
+    <string name="profile_group_self">ÜBER MICH</string>
+    <string name="profile_self_label">Ich-Beschreibung</string>
+    <string name="profile_self_help">Wie würdest du dich selbst beschreiben? Die KI-Berater nutzen das, um deine Nachrichten besser einzuordnen.</string>
+
+    <string name="profile_group_partner">ÜBER MEINEN PARTNER</string>
+    <string name="profile_partner_label">Partner-Beschreibung</string>
+    <string name="profile_partner_help">Wie würdest du deinen Partner beschreiben? Hilft den KI-Beratern, seine Perspektive besser einzuschätzen.</string>
+
+    <string name="profile_group_filter">FILTER</string>
+    <string name="profile_filter_label">Was ich nicht lesen möchte</string>
+    <string name="profile_filter_help">Beschreibe, welche Art von Nachrichten dich triggern oder verletzen könnte. Das bleibt geheim – dein Partner erfährt nie den Inhalt, nur ob eine Nachricht deswegen abgelehnt wurde.</string>
+
+    <string name="gemini_privacy_title">Wichtiger Hinweis</string>
+    <string name="gemini_privacy_body">Dein API-Schlüssel wird verschlüsselt nur auf diesem Gerät gespeichert. Deine Texte werden zur Verarbeitung an Google Gemini gesendet, aber niemals an deinen Partner oder einen Server dieser App.</string>
+    <string name="gemini_key_label">Gemini API-Schlüssel</string>
+    <string name="gemini_key_toggle_visibility">Schlüssel ein-/ausblenden</string>
+    <string name="gemini_key_set_title">Schlüssel hinterlegt</string>
+    <string name="gemini_key_set_body">Es ist bereits ein API-Schlüssel gespeichert. Trage einen neuen ein, um ihn zu ersetzen.</string>
+    <string name="gemini_action_save_and_test">Speichern &amp; testen</string>
+    <string name="gemini_action_remove_key">Schlüssel entfernen</string>
+    <string name="gemini_test_in_progress">Verbindung wird geprüft …</string>
+    <string name="gemini_test_success_title">Verbindung erfolgreich</string>
+    <string name="gemini_test_success_body">Der Schlüssel wurde geprüft und sicher gespeichert.</string>
+    <string name="gemini_test_failed_title">Verbindung fehlgeschlagen</string>
+    <string name="gemini_error_invalid_key">Der Schlüssel ist ungültig oder wurde abgelehnt.</string>
+    <string name="gemini_error_rate_limited">Zu viele Anfragen. Versuche es später erneut.</string>
+    <string name="gemini_error_network">Keine Verbindung möglich. Prüfe deine Internetverbindung.</string>
+    <string name="gemini_error_unknown">Unbekannter Fehler bei der Verbindung.</string>
+    <string name="gemini_remove_dialog_title">Schlüssel wirklich entfernen?</string>
+    <string name="gemini_remove_dialog_body">Ohne API-Schlüssel können keine Nachrichten mehr von der KI geprüft werden, bis du einen neuen hinterlegst.</string>
+
+    <string name="settings_row_pairing">Partner koppeln</string>
+    <string name="settings_row_pairing_sub">Einladungscode erzeugen oder eingeben</string>
+    <string name="pairing_title">Partner koppeln</string>
+    <string name="pairing_intro_title">So funktioniert die Kopplung</string>
+    <string name="pairing_intro_body">Ein Partner erzeugt einen Einladungscode (als QR-Code oder Text), der andere gibt ihn ein oder fügt ihn ein. Danach seid ihr Ende-zu-Ende-verschlüsselt verbunden.</string>
+    <string name="pairing_display_name_label">Dein Anzeigename</string>
+    <string name="pairing_server_url_label">Server-Adresse</string>
+    <string name="pairing_create_invite_title">Einladung erstellen</string>
+    <string name="pairing_action_create_invite">Einladungscode erzeugen</string>
+    <string name="pairing_qr_content_description">QR-Code der Einladung</string>
+    <string name="pairing_action_copy_code">Code kopieren</string>
+    <string name="pairing_accept_invite_title">Einladung annehmen</string>
+    <string name="pairing_enter_code_label">Einladungscode eingeben oder einfügen</string>
+    <string name="pairing_action_accept_invite">Partner verbinden</string>
+    <string name="pairing_connected_title">Verbunden mit</string>
+    <string name="pairing_action_disconnect">Partner trennen</string>
+    <string name="pairing_disconnect_dialog_title">Partner wirklich trennen?</string>
+    <string name="pairing_disconnect_dialog_body">Ihr müsst euch danach erneut koppeln, um wieder Nachrichten austauschen zu können. Eure Notizen bleiben erhalten.</string>
+    <string name="pairing_error_title">Kopplung fehlgeschlagen</string>
+    <string name="pairing_error_network">Keine Verbindung zum Server möglich. Prüfe die Server-Adresse und deine Internetverbindung.</string>
+    <string name="pairing_error_invalid_code">Der Einladungscode ist ungültig oder unvollständig.</string>
+    <string name="pairing_error_server">Der Server hat die Anfrage abgelehnt.</string>
+
+    <string name="settings_row_venting">Frust ablassen</string>
+    <string name="settings_row_venting_sub">Frei schreiben, ohne dass etwas versendet wird</string>
+    <string name="venting_title">Frust ablassen</string>
+    <string name="venting_privacy_title">Bleibt vollständig lokal</string>
+    <string name="venting_privacy_body">Hier kannst du dich frei aussprechen. Nichts davon wird an deinen Partner oder einen Server gesendet – nur eine kurze private Notiz für den Vermittler bleibt danach auf diesem Gerät.</string>
+    <string name="venting_input_label">Was beschäftigt dich?</string>
+    <string name="venting_action_send">Senden</string>
+    <string name="venting_action_switch_to_compose">Stattdessen eine Nachricht formulieren</string>
+    <string name="venting_error_title">Etwas ist schiefgelaufen</string>
+    <string name="venting_error_no_api_key">Hinterlege zuerst einen Gemini-API-Schlüssel in den Einstellungen.</string>
+    <string name="venting_error_network">Keine Verbindung möglich. Versuche es später erneut.</string>
+
+    <string name="settings_row_compose">Nachricht formulieren</string>
+    <string name="settings_row_compose_sub">Ich will dir etwas mitteilen</string>
+    <string name="compose_title">Nachricht formulieren</string>
+    <string name="compose_intro_title">Ich will dir etwas mitteilen</string>
+    <string name="compose_intro_body">Schreibe, was du deinem Partner sagen möchtest. Mehrere KI-Berater geben dir und deinem Partner-Bild dazu eine Einschätzung, bevor du entscheidest, ob und wie du die Nachricht sendest.</string>
+    <string name="compose_draft_label">Was möchtest du mitteilen?</string>
+    <string name="compose_action_start">Einschätzungen einholen</string>
+    <string name="compose_opinions_title">Meinungen der Berater</string>
+    <string name="compose_reply_label">Antwort an den Vermittler</string>
+    <string name="compose_action_reply">Antworten</string>
+    <string name="compose_action_send_now">Trotzdem senden</string>
+    <string name="compose_sent_title">Nachricht gesendet</string>
+    <string name="compose_sent_body">Deine Nachricht wurde verschlüsselt an deinen Partner übertragen.</string>
+    <string name="compose_error_title">Das hat nicht geklappt</string>
+    <string name="compose_error_no_api_key">Hinterlege zuerst einen Gemini-API-Schlüssel in den Einstellungen.</string>
+    <string name="compose_error_invalid_api_key">Dein Gemini-API-Schlüssel wurde abgelehnt. Prüfe ihn unter „Gemini-Verbindung“.</string>
+    <string name="compose_error_no_partner">Du bist noch mit niemandem gekoppelt. Richte zuerst die Partner-Kopplung ein.</string>
+    <string name="compose_error_network">Keine Verbindung möglich. Versuche es später erneut.</string>
+    <string name="compose_error_server">Der Server hat die Anfrage abgelehnt.</string>
+    <string name="compose_escalation_title">Mehrfach abgelehnt</string>
+    <string name="compose_escalation_body">Diese Nachricht wurde schon mehrmals abgelehnt. Vielleicht hilft eine Pause oder ein ganz neuer Ansatz.</string>
+
+    <string name="settings_row_inbox">Nachrichten von deinem Partner</string>
+    <string name="settings_row_inbox_sub">Zugelassene Nachrichten ansehen</string>
+    <string name="inbox_title">Nachrichten von deinem Partner</string>
+    <string name="inbox_action_refresh">Nach neuen Nachrichten suchen</string>
+    <string name="inbox_action_refreshing">Wird aktualisiert …</string>
+    <string name="inbox_empty_title">Noch keine Nachrichten.\nTippe oben auf „Nach neuen Nachrichten suchen“.</string>
+
+    <string name="settings_row_notes">Vermittler-Notizen</string>
+    <string name="settings_row_notes_sub">Notizen zu deinem Partner zurücksetzen</string>
+    <string name="notes_title">Vermittler-Notizen</string>
+    <string name="notes_intro_title">Private Notizen der KI-Berater</string>
+    <string name="notes_intro_body">Die KI-Berater merken sich über die Zeit, mit was für Menschen sie es zu tun haben. Diese Notizen verlassen nie dein Gerät und du kannst sie nicht einsehen – nur vollständig zurücksetzen.</string>
+    <string name="notes_action_reset">Notizen zurücksetzen</string>
+    <string name="notes_reset_dialog_title">Notizen wirklich zurücksetzen?</string>
+    <string name="notes_reset_dialog_body">Alle privaten Notizen der KI-Berater zu dieser Beziehung werden unwiderruflich gelöscht.</string>
+</resources>
